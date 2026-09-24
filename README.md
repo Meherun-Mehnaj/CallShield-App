@@ -31,12 +31,12 @@ Opening `index.html` directly (double-click) also works, but offline caching is 
 
 | Setting | What happens in the demo |
 |---|---|
+| App language | বাংলা, English, or বাংলা + EN (Bangla with a smaller English line). Changes every screen. Bangla mode also uses Bangla digits. The warning screen has its own switch for changing it mid-call. |
 | Real-time call protection | Off means the call isn't checked and no warning appears (useful as a control condition) |
 | AI voice-clone check | Off hides the "fake voice" sign and reason |
 | Predict the next move | Off hides the stage tracker and "likely next" card |
 | Code-arrival alarm | Off means the code SMS arrives silently, with no full-screen alarm |
 | Challenge coach | Off hides the *What to ask them* button |
-| Warning language | Sets the default language of the banner and warning screen |
 | Read warnings aloud / Strong vibration | Speaks and vibrates when the warning appears (vibration works on Android) |
 | Family safe word | Once set, the warning screen reminds the user to ask for it |
 | Study data | Download every feedback answer as CSV, or reset the demo |
@@ -50,6 +50,7 @@ Each feedback row in the CSV records which features were on (`prediction`, `code
 ```
 index.html            app shell
 css/styles.css        all styling
+js/i18n.js            interface text in English and Bangla
 js/data.js            content: scenario script, warning text, scam tactics, sample calls
 js/app.js             screens, router, call simulation, storage
 manifest.webmanifest  install info (name, colours, icon)
@@ -58,7 +59,7 @@ icons/                app icons
 start.bat             local server launcher
 ```
 
-To change the scam script, the warning wording or the tactics, edit `js/data.js`. The screens pick up the changes automatically.
+To change the scam script, the warning wording or the tactics, edit `js/data.js`. To change button labels or other interface text, edit `js/i18n.js`. Every entry has an `en` and a `bn` version. The screens pick up the changes automatically.
 
 ## Notes
 
