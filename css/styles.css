@@ -106,15 +106,6 @@ svg.i { flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 2; strok
 .strong { font-weight: 600; }
 .bn-big { font-size: 17px; font-weight: 600; line-height: 1.4; }
 
-/* Secondary English line shown under Bangla when the app language is "both". */
-.alt-line { display: block; margin-top: 2px; font-family: var(--font); font-size: .82em; font-weight: 400; line-height: 1.35; letter-spacing: 0; text-transform: none; color: var(--muted); }
-.dark .alt-line { color: var(--dark-muted); }
-.card.brand .alt-line { color: var(--brand-on); }
-.toast .alt-line { color: #C3CCD5; }
-.thanks .alt-line { color: var(--safe); }
-.tab > span { text-align: center; line-height: 1.2; }
-.tab .alt-line { font-size: 10px; margin-top: 0; }
-
 /* ---------- Cards ---------- */
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px; }
 .card.tight { padding: 14px 16px; border-radius: 16px; }

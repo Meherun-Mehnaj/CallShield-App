@@ -72,32 +72,21 @@ window.CS_DATA = {
   },
 
   otpAlert: {
-    sms: {
-      en: 'Your bKash verification code is ••••••. It is valid for 2 minutes. Never share this code with anyone.',
-      bn: 'আপনার বিকাশ ভেরিফিকেশন কোড ••••••। এটি ২ মিনিট কার্যকর। এই কোড কাউকে দেবেন না।'
-    },
-    sender: { en: 'bKash', bn: 'বিকাশ' },
-    title: { en: 'Stop! This is the code the caller wants', bn: 'থামুন! কলার ঠিক এই কোডটাই চাইছে' },
-    detail: {
-      en: 'A bKash code arrived while you are on a suspicious call. Anyone who asks for it is trying to take your money.',
-      bn: 'সন্দেহজনক কলের মধ্যেই একটি বিকাশ কোড এসেছে। যে এটা চাইছে, সে আপনার টাকা নিতে চাইছে।'
-    },
+    sms: 'Your bKash verification code is ••••••. It is valid for 2 minutes. Never share this code with anyone.',
+    bn: 'থামুন! কলার ঠিক এই কোডটাই চাইছে',
+    en: 'Stop! This is the code the caller wants',
+    detail: 'A bKash code arrived while you are on a suspicious call. Anyone who asks for it is trying to take your money.',
     spoken: { bn: 'থামুন। এই কোড কাউকে বলবেন না।', en: "Stop. Don't share this code with anyone." }
   },
 
   coach: {
     title: { bn: 'কলারকে যাচাই করুন', en: "Check who's really calling" },
-    intro: {
-      en: 'Ask something only the real Ammu would know. A scammer will dodge the question, rush you or get angry.',
-      bn: 'এমন কিছু জিজ্ঞেস করুন যা শুধু আসল আম্মু জানেন। প্রতারক প্রশ্ন এড়িয়ে যাবে, তাড়া দেবে বা রেগে যাবে।'
-    },
+    intro: 'Ask something only the real Ammu would know. A scammer will dodge the question, rush you or get angry.',
     questions: [
-      { id: 'safe', safeWord: true, bn: 'আমাদের পারিবারিক গোপন শব্দটা কী?', en: "What's our family safe word?",
-        tip: { en: 'Your family has a safe word set. This is the strongest check.', bn: 'আপনার পরিবারের গোপন শব্দ ঠিক করা আছে। এটাই সবচেয়ে শক্ত যাচাই।' } },
+      { id: 'safe', safeWord: true, bn: 'আমাদের পারিবারিক গোপন শব্দটা কী?', en: "What's our family safe word?", tip: 'Your family has a safe word set. This is the strongest check.' },
       { id: 'eid', bn: 'গত ঈদে বাসায় কী রান্না হয়েছিল?', en: 'What did we cook at home last Eid?' },
       { id: 'nick', bn: 'ছোটবেলায় আমাকে কী নামে ডাকতে?', en: 'What did you call me when I was little?' },
-      { id: 'callback', bn: 'আমি তোমার পুরনো নাম্বারে ফোন দিচ্ছি।', en: "I'll call you back on your old number.",
-        tip: { en: 'The real Ammu will say OK. A scammer will try to stop you.', bn: 'আসল আম্মু রাজি হবেন। প্রতারক আপনাকে থামাতে চাইবে।' } }
+      { id: 'callback', bn: 'আমি তোমার পুরনো নাম্বারে ফোন দিচ্ছি।', en: "I'll call you back on your old number.", tip: 'The real Ammu will say OK. A scammer will try to stop you.' }
     ]
   },
 
@@ -151,50 +140,25 @@ window.CS_DATA = {
     ]
   },
 
-  // Each tactic: name, what it is, an example line (what scammers actually say) and what to do.
   tactics: [
-    { en: 'Urgency', bn: 'তাড়াহুড়া',
-      what: { en: 'Pushes you to act now so you have no time to think or check.', bn: 'এখনই কিছু করতে চাপ দেয়, যাতে ভাবার বা যাচাই করার সময় না পান।' },
-      example: { bn: '“এখনই না পাঠালে বড় বিপদ হবে!”', en: '“If you don\'t send it now, something terrible will happen!”' },
-      todo: { en: 'Pause. Say you will call back. A real emergency can wait five minutes.', bn: 'থামুন। বলুন পরে ফোন দেবেন। সত্যিকারের বিপদ পাঁচ মিনিট অপেক্ষা করতে পারে।' } },
-    { en: 'Secrecy', bn: 'গোপনীয়তা',
-      what: { en: 'Tells you not to tell anyone, so nobody can warn you.', bn: 'কাউকে জানাতে নিষেধ করে, যাতে কেউ আপনাকে সাবধান করতে না পারে।' },
-      example: { bn: '“কাউকে বলো না, এটা আমাদের মধ্যে থাক।”', en: '“Don\'t tell anyone, keep this between us.”' },
-      todo: { en: 'Tell someone you trust right away.', bn: 'এখনই বিশ্বাসযোগ্য কাউকে জানান।' } },
-    { en: 'False authority', bn: 'ভুয়া কর্তৃপক্ষ',
-      what: { en: 'Pretends to be from bKash, Nagad, a bank or the police.', bn: 'বিকাশ, নগদ, ব্যাংক বা পুলিশ থেকে বলছে বলে ভান করে।' },
-      example: { bn: '“আমি বিকাশ অফিস থেকে বলছি, আপনার অ্যাকাউন্ট বন্ধ হয়ে যাবে।”', en: '“I\'m calling from the bKash office. Your account will be blocked.”' },
-      todo: { en: 'Hang up and call the official helpline yourself.', bn: 'কল কেটে নিজে অফিশিয়াল হেল্পলাইনে ফোন দিন।' } },
-    { en: 'Asking for your code or PIN', bn: 'কোড বা পিন চাওয়া',
-      what: { en: 'Asks for the OTP or PIN that lets them empty your account.', bn: 'ওটিপি বা পিন চায়, যা দিয়ে আপনার অ্যাকাউন্ট খালি করা যায়।' },
-      example: { bn: '“আপনার ফোনে একটা কোড গেছে, একটু বলেন তো।”', en: '“A code was sent to your phone. Just read it to me.”' },
-      todo: { en: 'Never share an OTP or PIN. No genuine caller will ask.', bn: 'ওটিপি বা পিন কখনো বলবেন না। আসল কেউ এটা চায় না।' } },
-    { en: 'Family emergency with a cloned voice', bn: 'পরিবারের বিপদ (নকল কণ্ঠ)',
-      what: { en: 'Uses AI to sound like a family member, often from a new number.', bn: 'AI দিয়ে পরিবারের কারো মতো গলা বানায়, প্রায়ই নতুন নাম্বার থেকে।' },
-      example: { bn: '“আমি আম্মু, নতুন নাম্বার থেকে বলছি। টাকা লাগবে।”', en: '“It\'s Mom, calling from a new number. I need money.”' },
-      todo: { en: 'Call their saved number, or ask your family safe word.', bn: 'তাদের সেভ করা নাম্বারে ফোন দিন, অথবা পারিবারিক গোপন শব্দ জিজ্ঞেস করুন।' } },
-    { en: 'Prize or refund bait', bn: 'পুরস্কার বা ফেরতের লোভ',
-      what: { en: 'Says you won money or are owed a refund, but must pay a fee first.', bn: 'বলে আপনি টাকা জিতেছেন বা টাকা ফেরত পাবেন, কিন্তু আগে ফি দিতে হবে।' },
-      example: { bn: '“আপনি পুরস্কার জিতেছেন, শুধু ফি-টা পাঠান।”', en: '“You\'ve won a prize, just send the fee.”' },
-      todo: { en: 'If you must pay to receive money, it is a scam.', bn: 'টাকা পেতে আগে টাকা দিতে হলে, সেটা প্রতারণা।' } }
+    { bn: 'তাড়াহুড়া', en: 'Urgency', what: 'Pushes you to act now so you have no time to think or check.', example: '“এখনই না পাঠালে বড় বিপদ হবে!”', todo: 'Pause. Say you will call back. A real emergency can wait five minutes.' },
+    { bn: 'গোপনীয়তা', en: 'Secrecy', what: 'Tells you not to tell anyone, so nobody can warn you.', example: '“কাউকে বলো না, এটা আমাদের মধ্যে থাক।”', todo: 'Tell someone you trust right away.' },
+    { bn: 'ভুয়া কর্তৃপক্ষ', en: 'False authority', what: 'Pretends to be from bKash, Nagad, a bank or the police.', example: '“আমি বিকাশ অফিস থেকে বলছি, আপনার অ্যাকাউন্ট বন্ধ হয়ে যাবে।”', todo: 'Hang up and call the official helpline yourself.' },
+    { bn: 'কোড বা পিন চাওয়া', en: 'Asking for your code or PIN', what: 'Asks for the OTP or PIN that lets them empty your account.', example: '“আপনার ফোনে একটা কোড গেছে, একটু বলেন তো।”', todo: 'Never share an OTP or PIN. No genuine caller will ask.' },
+    { bn: 'পরিবারের বিপদ (নকল কণ্ঠ)', en: 'Family emergency with a cloned voice', what: 'Uses AI to sound like a family member, often from a new number.', example: '“আমি আম্মু, নতুন নাম্বার থেকে বলছি। টাকা লাগবে।”', todo: 'Call their saved number, or ask your family safe word.' },
+    { bn: 'পুরস্কার বা ফেরতের লোভ', en: 'Prize or refund bait', what: 'Says you won money or are owed a refund, but must pay a fee first.', example: '“আপনি পুরস্কার জিতেছেন, শুধু ফি-টা পাঠান।”', todo: 'If you must pay to receive money, it is a scam.' }
   ],
 
-  // `time.day` is a key into CS_STR (today, yesterday, mon, sun).
   seedCalls: [
-    { id: 's1', name: '+880 18•• ••• 207', note: { en: 'Claimed to be a bKash officer · asked for PIN', bn: 'বিকাশ অফিসার দাবি করেছে · পিন চেয়েছে' }, time: { day: 'yesterday', hm: '19:03' }, kind: 'scam', blocked: true },
-    { id: 's2', name: { en: 'Abbu', bn: 'আব্বু' }, note: { en: 'Saved contact · no warning signs', bn: 'সেভ করা কন্টাক্ট · কোনো সতর্ক লক্ষণ নেই' }, time: { day: 'yesterday', hm: '17:40' }, kind: 'safe' },
-    { id: 's3', name: '+880 13•• ••• 915', note: { en: 'Said you won a prize · asked for a fee', bn: 'পুরস্কার জেতার কথা বলেছে · ফি চেয়েছে' }, time: { day: 'yesterday', hm: '14:20' }, kind: 'warn' },
-    { id: 's4', name: { en: 'Rahim (Office)', bn: 'রহিম (অফিস)' }, note: { en: 'Saved contact · no warning signs', bn: 'সেভ করা কন্টাক্ট · কোনো সতর্ক লক্ষণ নেই' }, time: { day: 'mon', hm: '11:02' }, kind: 'safe' },
-    { id: 's5', name: { en: 'Nusrat Apu', bn: 'নুসরাত আপু' }, note: { en: 'Saved contact · no warning signs', bn: 'সেভ করা কন্টাক্ট · কোনো সতর্ক লক্ষণ নেই' }, time: { day: 'sun', hm: '20:47' }, kind: 'safe' },
-    { id: 's6', name: '+880 19•• ••• 338', note: { en: 'Short call · no warning signs', bn: 'ছোট কল · কোনো সতর্ক লক্ষণ নেই' }, time: { day: 'sun', hm: '12:10' }, kind: 'safe' }
+    { id: 's1', name: '+880 18•• ••• 207', note: 'Claimed to be a bKash officer · asked for PIN', time: 'Yesterday 19:03', kind: 'scam', blocked: true },
+    { id: 's2', name: 'Abbu', note: 'Saved contact · no warning signs', time: 'Yesterday 17:40', kind: 'safe' },
+    { id: 's3', name: '+880 13•• ••• 915', note: 'Said you won a prize · asked for a fee', time: 'Yesterday 14:20', kind: 'warn' },
+    { id: 's4', name: 'Rahim (Office)', note: 'Saved contact · no warning signs', time: 'Mon 11:02', kind: 'safe' },
+    { id: 's5', name: 'Nusrat Apu', note: 'Saved contact · no warning signs', time: 'Sun 20:47', kind: 'safe' },
+    { id: 's6', name: '+880 19•• ••• 338', note: 'Short call · no warning signs', time: 'Sun 12:10', kind: 'safe' }
   ],
 
-  trustedContacts: [{ en: 'Ammu', bn: 'আম্মু' }, { en: 'Abbu', bn: 'আব্বু' }, { en: 'Nusrat Apu', bn: 'নুসরাত আপু' }],
-  // `v` is what gets saved in the study CSV, so it stays in English whatever the app language.
-  helpOptions: [{ v: 'Yes', bn: 'হ্যাঁ' }, { v: 'Not sure', bn: 'নিশ্চিত নই' }, { v: 'No', bn: 'না' }],
-  reasonOptions: [
-    { v: 'Code request', bn: 'কোড চাওয়া' }, { v: 'Code alarm', bn: 'কোড অ্যালার্ম' },
-    { v: 'Prediction', bn: 'আগাম অনুমান' }, { v: 'Dodged question', bn: 'প্রশ্ন এড়ানো' },
-    { v: 'Urgency', bn: 'তাড়াহুড়া' }, { v: 'Secrecy', bn: 'গোপন রাখা' }, { v: 'Fake voice', bn: 'নকল কণ্ঠ' }
-  ]
+  trustedContacts: ['Ammu', 'Abbu', 'Nusrat Apu'],
+  helpOptions: ['Yes', 'Not sure', 'No'],
+  reasonOptions: ['Code request', 'Code alarm', 'Prediction', 'Dodged question', 'Urgency', 'Secrecy', 'Fake voice']
 };

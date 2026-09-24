@@ -1,10 +1,9 @@
 /* Caches the app shell so CallShield opens offline after the first visit. */
-const CACHE = 'callshield-v4';
+const CACHE = 'callshield-v2';
 const SHELL = [
   './',
   './index.html',
   './css/styles.css',
-  './js/i18n.js',
   './js/data.js',
   './js/app.js',
   './manifest.webmanifest',
