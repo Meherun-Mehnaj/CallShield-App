@@ -31,7 +31,7 @@ Opening `index.html` directly (double-click) also works, but offline caching is 
 
 | Setting | What happens in the demo |
 |---|---|
-| App language | বাংলা, English, or বাংলা + EN (Bangla with a smaller English line). Changes every screen. Bangla mode also uses Bangla digits. The warning screen has its own switch for changing it mid-call. |
+| App language | বাংলা (default), English, or বাংলা + EN (Bangla with a smaller English line). Changes every screen. Bangla mode also uses Bangla digits. The warning screen has its own switch for changing it mid-call. |
 | Real-time call protection | Off means the call isn't checked and no warning appears (useful as a control condition) |
 | AI voice-clone check | Off hides the "fake voice" sign and reason |
 | Predict the next move | Off hides the stage tracker and "likely next" card |

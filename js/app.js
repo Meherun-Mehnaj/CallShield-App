@@ -45,7 +45,7 @@
       settings: {
         live: true, voice: true, contacts: true,
         predict: true, otpGuard: true, coach: true,
-        speak: true, vibrate: true, lang: 'both', safeWord: ''
+        speak: true, vibrate: true, lang: 'bn', langChosen: false, safeWord: ''
       },
       calls: D.seedCalls.map((c) => JSON.parse(JSON.stringify(c))),
       feedback: []
@@ -53,20 +53,22 @@
   }
   function load() {
     const d = defaults();
+    let state = d;
     try {
       const raw = localStorage.getItem(STORE_KEY);
+      const old = raw ? null : localStorage.getItem(OLD_STORE_KEY);
       if (raw) {
         const saved = JSON.parse(raw);
-        return { settings: Object.assign(d.settings, saved.settings), calls: saved.calls || d.calls, feedback: saved.feedback || [] };
-      }
-      // Earlier version: keep settings and study feedback, start the call history fresh (it now has Bangla text).
-      const old = localStorage.getItem(OLD_STORE_KEY);
-      if (old) {
+        state = { settings: Object.assign(d.settings, saved.settings), calls: saved.calls || d.calls, feedback: saved.feedback || [] };
+      } else if (old) {
+        // Earlier version: keep settings and study feedback, start the call history fresh (it now has Bangla text).
         const saved = JSON.parse(old);
-        return { settings: Object.assign(d.settings, saved.settings), calls: d.calls, feedback: saved.feedback || [] };
+        state = { settings: Object.assign(d.settings, saved.settings), calls: d.calls, feedback: saved.feedback || [] };
       }
     } catch (e) { /* storage unavailable: fall back to defaults */ }
-    return d;
+    // Bangla is the default; only a language the person picked themselves in Settings overrides it.
+    if (!state.settings.langChosen) state.settings.lang = 'bn';
+    return state;
   }
   function save() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); } catch (e) { /* ignore */ }
@@ -956,7 +958,7 @@
       el.setAttribute('aria-expanded', String(open));
     },
     toggle: (el) => { const k = el.dataset.k; S.settings[k] = !S.settings[k]; save(); render(); },
-    lang: (el) => { S.settings.lang = el.dataset.v; save(); render(); },
+    lang: (el) => { S.settings.lang = el.dataset.v; S.settings.langChosen = true; save(); render(); },
     'safe-edit': () => {
       ui.editingSafe = !ui.editingSafe;
       ui.safeDraft = S.settings.safeWord;
@@ -975,9 +977,9 @@
       if (!window.confirm(plain(L.confirmReset))) return;
       stopTimer();
       call = null;
-      const keepLang = S.settings.lang;
+      const keep = { lang: S.settings.lang, langChosen: S.settings.langChosen };
       S = defaults();
-      S.settings.lang = keepLang;
+      Object.assign(S.settings, keep);
       save();
       Object.assign(ui, { filter: 'All', sheet: false, coach: false, warnLang: null, editingSafe: false, safeDraft: '' });
       render();
