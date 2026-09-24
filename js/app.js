@@ -3,6 +3,7 @@
   'use strict';
 
   const D = window.CS_DATA;
+  const SCENARIOS = window.CS_SCENARIOS;
   const ICONS = window.CS_ICONS;
   const STORE_KEY = 'callshield.v1';
   const SECONDS_PER_STEP = 3;
@@ -54,10 +55,19 @@
   let S = load();
 
   // Transient UI state
-  const ui = { filter: 'All', sheet: false, coach: false, warnLang: null, editingSafe: false, safeDraft: '', freshId: null };
+  const ui = { filter: 'All', sheet: false, coach: false, warnLang: null, editingSafe: false, safeDraft: '', freshId: null, sid: SCENARIOS[0].id };
   let call = null; // the running call, or the one that just ended
   let lastRoute = null;
   let toastTimer = null;
+
+  // The demo scam call in use: the running (or last) call's, else the one picked on Home.
+  function sc() {
+    const id = call ? call.sid : ui.sid;
+    return SCENARIOS.find((s) => s.id === id) || SCENARIOS[0];
+  }
+  const alertOf = (s) => Object.assign({}, D.otpAlert, s.alert || {});
+  // Shared warning-screen text plus this scenario's own headline, banner, verify line and so on.
+  const warnText = (s, l) => Object.assign({}, D.warnUI[l], s.warning[l]);
 
   // ---------- Router ----------
   const routes = { home, incoming, call: callScreen, warning, after, calls, learn, settings };
@@ -180,10 +190,22 @@
           </div>
         </header>
         ${status}
-        <section class="card stack" style="gap:12px">
+        <section class="card stack" style="gap:6px;padding:16px 16px 8px">
           <h2 class="h2">Try a demo scam call</h2>
-          <p class="body">See how CallShield warns you when a cloned voice pretends to be your mother and asks for your bKash code.</p>
-          <button class="btn btn-primary" data-action="start-demo">${icon('phone', 20)}Start demo call</button>
+          <p class="body" style="font-size:14px">Choose who is calling. See how CallShield spots the trick and warns you.</p>
+          <ul class="demo-list">
+            ${SCENARIOS.map((s) => `
+            <li>
+              <button class="demo-pick" data-action="start-demo" data-v="${s.id}">
+                <span class="demo-icon">${icon(s.icon, 20)}</span>
+                <span class="grow stack" style="gap:1px">
+                  <span class="strong" style="font-size:16px">${s.title.bn}</span>
+                  <span class="small">${s.title.en} · ${s.blurb.en}</span>
+                </span>
+                <span class="demo-go">${icon('phone', 18)}</span>
+              </button>
+            </li>`).join('')}
+          </ul>
         </section>
         <section class="stack">
           <h2 class="eyebrow">This week</h2>
@@ -210,7 +232,7 @@
       <div class="call-top">
         <span class="small" style="font-size:15px">Incoming call</span>
         <div class="avatar-ring">${icon('user', 48)}</div>
-        <h1 class="caller-number">${D.scenario.number}</h1>
+        <h1 class="caller-number">${sc().number}</h1>
         <span class="small" style="font-size:15px;margin-top:6px">Mobile · Not in your contacts</span>
       </div>
       <section class="shield-note">
@@ -233,8 +255,9 @@
     return `<div class="screen dark">
       <header class="call-head">
         <div class="stack" style="gap:2px">
-          <h1>${D.scenario.number}</h1>
+          <h1>${sc().number}</h1>
           <span class="small" style="font-size:14px">On call · <span id="clock">00:00</span></span>
+          <span class="demo-tag">Demo: ${sc().title.en}</span>
         </div>
         <button class="btn btn-ghost-dark" data-action="replay">Replay demo</button>
       </header>
@@ -279,8 +302,9 @@
 
   function warnBanner() {
     const lang = S.settings.lang;
-    const title = lang === 'en' ? D.warning.en.banner : D.warning.bn.banner;
-    const sub = lang === 'bn' ? 'খুব বেশি ঝুঁকি। কলার আপনার বিকাশ কোড চেয়েছে।' : 'Very high scam risk. The caller asked for your bKash code.';
+    const w = sc().warning;
+    const title = lang === 'en' ? w.en.banner : w.bn.banner;
+    const sub = lang === 'bn' ? w.bn.bannerSub : w.en.bannerSub;
     return `<section class="warn-banner" role="alert">
       <div class="row" style="align-items:flex-start">
         <div class="warn-icon">${icon('alert', 22)}</div>
@@ -298,8 +322,9 @@
 
   function warning() {
     const lang = ui.warnLang || S.settings.lang;
-    const P = lang === 'en' ? D.warning.en : D.warning.bn;
-    const A = lang === 'both' ? D.warning.en : null;
+    const s = sc();
+    const P = warnText(s, lang === 'en' ? 'en' : 'bn');
+    const A = lang === 'both' ? warnText(s, 'en') : null;
     const alt = (key) => (A ? `<span class="alt">${A[key]}</span>` : '');
     const reasons = activeReasons();
     const segBtn = (v, label) => `<button data-action="wlang" data-v="${v}" aria-pressed="${lang === v}">${label}</button>`;
@@ -316,7 +341,7 @@
       </article>`;
     }).join('');
 
-    const safeTip = S.settings.safeWord ? `
+    const safeTip = S.settings.safeWord && s.voice ? `
       <div class="card tight row" style="border-color:#EBD9D5">
         <span style="color:var(--brand);display:flex">${icon('lock', 20)}</span>
         <span class="grow strong" style="font-size:15px">${P.safeWord}${alt('safeWord')}</span>
@@ -373,15 +398,16 @@
     const e = call.entry;
     const on = S.settings.live;
     const a = call.actions;
+    const next = sc().after;
     const head = call.warned
       ? { cls: 'safe', ic: 'shieldCheck', bn: 'আপনি নিরাপদ আছেন', en: 'You stayed safe. No money or code was shared.' }
       : { cls: 'neutral', ic: 'phone', bn: 'কল শেষ হয়েছে', en: on ? 'You ended the call before a code was asked for. Good instinct.' : 'This call was not checked because protection was off.' };
 
     const verifyCard = call.verify ? `
       <section class="card muted-card stack" style="gap:10px;padding:16px">
-        <h2 class="h2" style="color:var(--brand)">Now check with Ammu</h2>
-        <p class="body">Call her on the number saved in your contacts. If she is fine, the call was a scam.</p>
-        <button class="btn btn-primary" data-action="call-saved">${icon('phone', 20)}Call Ammu (saved number)</button>
+        <h2 class="h2" style="color:var(--brand)">${next.verifyTitle}</h2>
+        <p class="body">${next.verifyBody}</p>
+        <button class="btn btn-primary" data-action="call-saved">${icon('phone', 20)}${next.verifyBtn}</button>
       </section>` : '';
 
     const actionRow = (id, title, detail, label, doneLabel) => `
@@ -414,7 +440,7 @@
           <h2 class="eyebrow">Next steps</h2>
           ${actionRow('block', 'Block this number', "It won't be able to call you again", 'Block', 'Blocked')}
           ${actionRow('report', 'Report to bKash', 'Helpline 16247 · shares number and time only', 'Report', 'Reported')}
-          ${actionRow('family', 'Warn your family', 'Tell them a fake “Ammu” voice is calling', 'Send alert', 'Sent')}
+          ${actionRow('family', 'Warn your family', next.familyNote, 'Send alert', 'Sent')}
         </section>
         ${feedback}
         <button class="btn btn-primary lg" data-action="done">Done</button>
@@ -481,7 +507,7 @@
         <section class="card stack" style="gap:12px;padding:16px">
           <h2 class="h2">Scam calls follow a script</h2>
           <ol class="script-steps">
-            ${D.scenario.stages.map((s, i) => `<li><span class="n">${i + 1}</span><span class="stack" style="gap:0"><span class="strong" style="font-size:14px">${s.bn}</span><span class="small" style="font-size:12px">${s.en}</span></span></li>`).join('')}
+            ${D.scriptStages.map((s, i) => `<li><span class="n">${i + 1}</span><span class="stack" style="gap:0"><span class="strong" style="font-size:14px">${s.bn}</span><span class="small" style="font-size:12px">${s.en}</span></span></li>`).join('')}
           </ol>
           <p class="body" style="font-size:14px">If you know which step a call is at, you can guess what comes next. CallShield does this for you during a call and warns you before the request comes.</p>
         </section>
@@ -581,39 +607,39 @@
 
   // ---------- Demo call simulation ----------
   function callState() {
-    const sc = D.scenario;
+    const s = sc();
     const st = S.settings;
     const step = Math.min(LAST_STEP, Math.floor(call.secs / SECONDS_PER_STEP));
     const flags = [];
     for (let i = 0; i <= step; i++) {
-      sc.flagsByStep[i].forEach((f) => {
+      s.flagsByStep[i].forEach((f) => {
         if (f.voice && !st.voice) return;
         if (f.otp && !st.otpGuard) return;
         flags.push(Object.assign({ t: i * SECONDS_PER_STEP }, f));
       });
     }
-    if (call.dodge) flags.push(Object.assign({ t: call.dodge.at }, sc.dodgeFlag));
+    if (call.dodge) flags.push(Object.assign({ t: call.dodge.at }, D.dodgeFlag));
     flags.sort((a, b) => a.t - b.t);
-    let risk = (st.voice ? sc.riskByStep : sc.riskByStepNoVoice)[step];
+    let risk = (!st.voice && s.riskByStepNoVoice ? s.riskByStepNoVoice : s.riskByStep)[step];
     if (call.dodge) risk = Math.min(99, risk + 10);
     // Right after a check question, the caller's dodge replaces the scripted line for a moment.
     const dodging = call.dodge && call.secs - call.dodge.at <= SECONDS_PER_STEP;
-    const line = dodging ? sc.dodgeLine : sc.lines[step];
-    const stage = Math.min(step, sc.stages.length - 1);
+    const line = dodging ? s.dodgeLine : s.lines[step];
+    const stage = Math.min(step, s.stages.length - 1);
     return { step, flags, risk, line, stage };
   }
   function activeReasons() {
-    return D.warning.reasons.filter((r) => (S.settings.voice || !r.voice) && (!r.otp || (call && call.otpArrived)));
+    return sc().warning.reasons.filter((r) => (S.settings.voice || !r.voice) && (!r.otp || (call && call.otpArrived)));
   }
   function predictHtml(stage) {
-    const sc = D.scenario;
-    const p = sc.predictions[stage];
-    const bars = sc.stages.map((s, i) =>
-      `<div class="stage${i < stage ? ' done' : i === stage ? ' now' : ''}"><span class="bar"></span><span class="lbl">${s.bn}</span></div>`).join('');
+    const s = sc();
+    const p = s.predictions[stage];
+    const bars = s.stages.map((g, i) =>
+      `<div class="stage${i < stage ? ' done' : i === stage ? ' now' : ''}"><span class="bar"></span><span class="lbl">${g.bn}</span></div>`).join('');
     return `
       <div class="row" style="gap:8px">
         <span style="color:#9CCFE0;display:flex">${icon('eye', 18)}</span>
-        <span class="strong grow" style="font-size:14px;color:var(--dark-ink-2)">Scam script · stage ${stage + 1} of ${sc.stages.length}: ${sc.stages[stage].en}</span>
+        <span class="strong grow" style="font-size:14px;color:var(--dark-ink-2)">Scam script · stage ${stage + 1} of ${s.stages.length}: ${s.stages[stage].en}</span>
       </div>
       <div class="stages" aria-hidden="true">${bars}</div>
       <span class="eyebrow" style="margin-top:4px">এরপর সম্ভবত · Likely next</span>
@@ -679,9 +705,10 @@
       try { navigator.vibrate([400, 150, 400, 150, 600]); } catch (e) { /* ignore */ }
     }
     if (st.speak) {
+      const w = sc().warning;
       const parts = [];
-      if (st.lang !== 'en') parts.push({ text: D.warning.bn.spoken, lang: 'bn' });
-      if (st.lang !== 'bn') parts.push({ text: D.warning.en.spoken, lang: 'en' });
+      if (st.lang !== 'en') parts.push({ text: w.bn.spoken, lang: 'bn' });
+      if (st.lang !== 'bn') parts.push({ text: w.en.spoken, lang: 'en' });
       speak(parts);
     }
   }
@@ -691,9 +718,10 @@
       try { navigator.vibrate([800, 200, 800, 200, 800]); } catch (e) { /* ignore */ }
     }
     if (st.speak) {
+      const spoken = alertOf(sc()).spoken;
       const parts = [];
-      if (st.lang !== 'en') parts.push({ text: D.otpAlert.spoken.bn, lang: 'bn' });
-      if (st.lang !== 'bn') parts.push({ text: D.otpAlert.spoken.en, lang: 'en' });
+      if (st.lang !== 'en') parts.push({ text: spoken.bn, lang: 'bn' });
+      if (st.lang !== 'bn') parts.push({ text: spoken.en, lang: 'en' });
       speak(parts);
     }
     syncOverlays();
@@ -718,32 +746,33 @@
 
   // ---------- Overlays shown on top of the call and warning screens ----------
   function otpHtml() {
-    const o = D.otpAlert;
+    const o = alertOf(sc());
     return `<div class="overlay otp-alarm" role="alertdialog" aria-modal="true" aria-labelledby="otpTitle">
       <div class="sms">
         <div class="row" style="gap:10px">
           <span class="sms-icon">${icon('message', 16)}</span>
-          <span class="strong grow" style="font-size:14px">bKash</span>
+          <span class="strong grow" style="font-size:14px">${o.sender}</span>
           <span class="small" style="font-size:12px">now</span>
         </div>
         <p style="font-size:14px;line-height:1.45;margin-top:6px">${o.sms}</p>
       </div>
       <div class="otp-body">
-        <div class="otp-icon">${icon('lock', 32)}</div>
+        <div class="otp-icon">${icon(o.icon, 32)}</div>
         <h2 id="otpTitle" class="otp-title" tabindex="-1">${o.bn}</h2>
         <p class="otp-en">${o.en}</p>
         <p class="otp-detail">${o.detail}</p>
-        ${S.settings.predict ? `<span class="came-true light">${icon('check', 16)}CallShield predicted this request</span>` : ''}
+        ${S.settings.predict ? `<span class="came-true light">${icon('check', 16)}${o.predicted}</span>` : ''}
       </div>
       <div class="stack otp-actions">
         <button class="btn btn-light lg" data-action="hangup" style="color:var(--danger-ink)">${icon('phone', 22, 'rot')}এখনই কল কাটুন · Hang up now</button>
-        <button class="btn btn-ghost-light" data-action="otp-dismiss">আমি কোড বলব না · I won't share it</button>
+        <button class="btn btn-ghost-light" data-action="otp-dismiss">${o.keep}</button>
       </div>
     </div>`;
   }
   function coachHtml() {
-    const c = D.coach;
+    const c = Object.assign({}, D.coach, sc().coach);
     const hasWord = !!S.settings.safeWord;
+    const usesSafeWord = c.questions.some((q) => q.safeWord);
     const rows = c.questions.filter((q) => !q.safeWord || hasWord).map((q) => `
       <div class="coach-q">
         <div class="grow stack" style="gap:2px">
@@ -759,7 +788,7 @@
         <p class="small" style="margin-top:-8px">${c.title.en}</p>
         <p class="body">${c.intro}</p>
         ${rows}
-        ${hasWord ? '' : '<p class="small">Tip: set a family safe word in Settings. It is the strongest check against a cloned voice.</p>'}
+        ${hasWord || !usesSafeWord ? '' : '<p class="small">Tip: set a family safe word in Settings. It is the strongest check against a cloned voice.</p>'}
         <button class="btn btn-outline" data-action="coach-close">Close</button>
       </section>
     </div>`;
@@ -783,7 +812,7 @@
   }
   function startCall() {
     stopTimer();
-    call = Object.assign(freshCallState(), { active: true, muted: false, speaker: false, actions: {}, fb: {}, verify: false, timer: null });
+    call = Object.assign(freshCallState(), { sid: ui.sid, active: true, muted: false, speaker: false, actions: {}, fb: {}, verify: false, timer: null });
     call.timer = setInterval(tick, 1000);
     ui.warnLang = null;
     ui.sheet = false;
@@ -796,11 +825,13 @@
     const on = S.settings.live;
     const { flags } = callState();
     const kind = !on ? 'safe' : call.warned ? 'scam' : flags.length ? 'warn' : 'safe';
-    const note = !on ? 'Said “I\'m Ammu” · not checked'
-      : call.otpArrived ? 'Said “I\'m Ammu” · wanted the bKash code that arrived'
-      : call.warned ? 'Said “I\'m Ammu” · asked for bKash code'
-      : 'Said “I\'m Ammu” · you hung up early';
-    const entry = { id: 'c' + Date.now(), name: D.scenario.number, note, time: 'Today ' + clockNow(), kind, unchecked: !on };
+    const s = sc();
+    const end = !on ? 'not checked'
+      : call.otpArrived ? s.log.alert
+      : call.warned ? s.log.warned
+      : 'you hung up early';
+    const note = s.log.claim + ' · ' + end;
+    const entry = { id: 'c' + Date.now(), name: s.number, note, time: 'Today ' + clockNow(), kind, unchecked: !on };
     S.calls.unshift(entry);
     save();
     call.active = false;
@@ -817,6 +848,7 @@
     if (!fb.help || !fb.reason) return;
     const row = {
       time: new Date().toISOString(),
+      scenario: call.sid,
       helped: fb.help,
       reason: fb.reason,
       warned: call.warned,
@@ -835,7 +867,7 @@
   }
   function exportCsv() {
     if (!S.feedback.length) { toast('No feedback yet. Finish a demo call and answer the two questions first.'); return; }
-    const cols = ['time', 'helped', 'reason', 'warned', 'callSeconds', 'language', 'voiceCheck',
+    const cols = ['time', 'scenario', 'helped', 'reason', 'warned', 'callSeconds', 'language', 'voiceCheck',
       'prediction', 'codeAlarm', 'coach', 'codeArrived', 'askedCheckQuestion'];
     const cell = (v) => '"' + String(v === undefined ? '' : v).replace(/"/g, '""') + '"';
     const csv = [cols.join(',')].concat(S.feedback.map((r) => cols.map((c) => cell(r[c])).join(','))).join('\r\n');
@@ -851,7 +883,7 @@
 
   // ---------- Actions ----------
   const actions = {
-    'start-demo': () => go('incoming'),
+    'start-demo': (el) => { ui.sid = el.dataset.v || SCENARIOS[0].id; go('incoming'); },
     'enable-live': () => { S.settings.live = true; save(); render(); },
     decline: () => go('home'),
     accept: startCall,
@@ -873,7 +905,7 @@
       ui.coach = false;
       syncOverlays();
       updateCall();
-      toast('They avoided your question. The real Ammu would just answer. That is another scam sign.');
+      toast('They avoided your question. A real caller would just answer. That is another scam sign.');
     },
     'otp-dismiss': () => {
       call.otpOpen = false;
@@ -890,7 +922,7 @@
       const lang = ui.warnLang || S.settings.lang;
       const reasons = activeReasons();
       const build = (l) => {
-        const P = D.warning[l];
+        const P = warnText(sc(), l);
         return [P.headline, P.sub].concat(reasons.map((r) => r[l].title), [P.hangup]).join(l === 'bn' ? '। ' : '. ');
       };
       const parts = [];
@@ -905,7 +937,7 @@
       render();
     },
     'continue-call': () => { ui.sheet = false; go('call'); },
-    'call-saved': () => toast('Demo only: this would open your dialer with Ammu\'s saved number.'),
+    'call-saved': () => toast(sc().after.verifyToast),
     post: (el) => {
       const id = el.dataset.v;
       const on = !call.actions[id];

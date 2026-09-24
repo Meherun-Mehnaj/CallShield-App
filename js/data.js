@@ -26,118 +26,60 @@ window.CS_ICONS = {
 };
 
 window.CS_DATA = {
-  // The demo call: a cloned "Ammu" voice from an unknown number asks for a bKash code.
-  scenario: {
-    number: '+880 17•• ••• 482',
-    contact: 'Ammu',
-    lines: [
-      { bn: 'হ্যালো বাবা, আমি আম্মু বলছি। এটা আমার নতুন নাম্বার।', en: "Hello dear, it's Mom. This is my new number." },
-      { bn: 'আমি একটা বিপদে পড়েছি, এখনই টাকা লাগবে।', en: "I'm in trouble, I need money right now." },
-      { bn: 'কাউকে বলো না, তোমার আব্বুকেও না।', en: "Don't tell anyone, not even your father." },
-      { bn: 'তোমার বিকাশে একটা কোড যাবে, ওটা আমাকে বলো।', en: 'A code will come to your bKash. Tell it to me.' },
-      { bn: 'হ্যালো? শুনছ? তাড়াতাড়ি করো, সময় নেই।', en: "Hello? Are you listening? Hurry, there's no time." },
-      { bn: 'কোড এসেছে? নাম্বারগুলো পড়ে শোনাও!', en: 'Did the code come? Read me the numbers!' }
-    ],
-    // Signs detected at each step of the conversation. `voice` signs depend on the voice-clone setting,
-    // `otp` signs on the code-arrival alarm setting.
-    flagsByStep: [
-      [{ bn: 'অচেনা নাম্বার, কিন্তু পরিবারের সদস্য দাবি', en: 'Unknown number claims to be family', level: 'medium' }],
-      [{ bn: 'তাড়াহুড়া: এখনই টাকা চাইছে', en: 'Urgency: wants money right now', level: 'high' },
-       { bn: 'কণ্ঠস্বর কৃত্রিম মনে হচ্ছে', en: 'Voice sounds machine-made (possible AI clone)', level: 'high', voice: true }],
-      [{ bn: 'গোপন রাখতে বলছে', en: 'Secrecy: asks you not to tell anyone', level: 'high' }],
-      [{ bn: 'বিকাশের কোড (OTP) চাইছে', en: 'Asks for your bKash code (OTP)', level: 'critical' }],
-      [],
-      [{ bn: 'কলের মধ্যেই বিকাশ কোড এসেছে', en: 'A bKash code arrived during this call', level: 'critical', otp: true }]
-    ],
-    riskByStep: [22, 55, 74, 93, 96, 99],
-    riskByStepNoVoice: [22, 48, 68, 91, 94, 98],
+  // The demo calls themselves live in scenarios.js. This is what they share.
 
-    // Scam calls follow a script. Knowing the current stage lets CallShield warn about the next one.
-    stages: [
-      { bn: 'পরিচয় দাবি', en: 'Hook' },
-      { bn: 'বিপদের গল্প', en: 'Crisis' },
-      { bn: 'গোপন রাখা', en: 'Secrecy' },
-      { bn: 'কোড নেওয়া', en: 'Take' }
-    ],
-    predictions: [
-      { bn: 'এরপর সম্ভবত বলবে বিপদে পড়েছে, এখনই সাহায্য লাগবে।', en: "Next they'll probably say they're in trouble and need help fast." },
-      { bn: 'এরপর সম্ভবত গোপন রাখতে বলবে, তারপর টাকা বা কোড চাইবে।', en: "Next they'll likely ask you to keep it secret, then ask for money or a code." },
-      { bn: 'এরপর আপনার বিকাশে আসা কোড চাইবে। কোড কখনো বলবেন না।', en: "Next they'll ask for the code sent to your bKash. Never read it out." },
-      { bn: 'কোড না পেলে আরও চাপ দেবে, রাগ বা কান্না করতে পারে। কল কেটে দিন।', en: "If you don't give it, they'll push harder or get upset. Hang up." }
-    ],
+  // The general shape of a scam call, shown on the Learn tab.
+  scriptStages: [
+    { bn: 'পরিচয় দাবি', en: 'Hook' },
+    { bn: 'চাপ বা বিপদের গল্প', en: 'Pressure' },
+    { bn: 'গোপন রাখা বা হুমকি', en: 'Isolate' },
+    { bn: 'টাকা বা কোড নেওয়া', en: 'Take' }
+  ],
 
-    // What the scammer says when the user asks a check question from the challenge coach.
-    dodgeLine: { bn: 'এত প্রশ্ন করার সময় নেই! তাড়াতাড়ি কোডটা বলো!', en: 'No time for questions! Just tell me the code, quickly!' },
-    dodgeFlag: { bn: 'যাচাইয়ের প্রশ্ন এড়িয়ে গেছে', en: 'Avoided your check question', level: 'critical' }
-  },
+  // Added when the person asks a check question from the challenge coach and the caller dodges it.
+  dodgeFlag: { bn: 'যাচাইয়ের প্রশ্ন এড়িয়ে গেছে', en: 'Avoided your check question', level: 'critical' },
 
+  // Default mid-call alarm: a bKash code arrives. A scenario can replace it with its own `alert`.
   otpAlert: {
+    icon: 'lock',
+    sender: 'bKash',
     sms: 'Your bKash verification code is ••••••. It is valid for 2 minutes. Never share this code with anyone.',
     bn: 'থামুন! কলার ঠিক এই কোডটাই চাইছে',
     en: 'Stop! This is the code the caller wants',
     detail: 'A bKash code arrived while you are on a suspicious call. Anyone who asks for it is trying to take your money.',
+    predicted: 'CallShield predicted this request',
+    keep: 'আমি কোড বলব না · I won\'t share it',
     spoken: { bn: 'থামুন। এই কোড কাউকে বলবেন না।', en: "Stop. Don't share this code with anyone." }
   },
 
   coach: {
-    title: { bn: 'কলারকে যাচাই করুন', en: "Check who's really calling" },
-    intro: 'Ask something only the real Ammu would know. A scammer will dodge the question, rush you or get angry.',
-    questions: [
-      { id: 'safe', safeWord: true, bn: 'আমাদের পারিবারিক গোপন শব্দটা কী?', en: "What's our family safe word?", tip: 'Your family has a safe word set. This is the strongest check.' },
-      { id: 'eid', bn: 'গত ঈদে বাসায় কী রান্না হয়েছিল?', en: 'What did we cook at home last Eid?' },
-      { id: 'nick', bn: 'ছোটবেলায় আমাকে কী নামে ডাকতে?', en: 'What did you call me when I was little?' },
-      { id: 'callback', bn: 'আমি তোমার পুরনো নাম্বারে ফোন দিচ্ছি।', en: "I'll call you back on your old number.", tip: 'The real Ammu will say OK. A scammer will try to stop you.' }
-    ]
+    title: { bn: 'কলারকে যাচাই করুন', en: "Check who's really calling" }
   },
 
-  warning: {
+  // Warning-screen text shared by every scenario (each scenario adds its own headline, reasons and so on).
+  warnUI: {
     bn: {
       back: 'কলে ফিরুন', level: 'খুব বেশি ঝুঁকি',
-      headline: 'সাবধান! এই কলটি প্রতারণা হতে পারে',
-      sub: 'কলার নিজেকে আপনার আম্মু বলছে, কিন্তু কয়েকটি লক্ষণ মিলছে না।',
       listen: 'জোরে শুনুন', why: 'কেন আমরা এটা বলছি', todo: 'এখন কী করবেন',
-      hangup: 'এখনই কল কেটে দিন', verify: 'আম্মুর সেভ করা নাম্বারে ফোন করে যাচাই করুন',
+      hangup: 'এখনই কল কেটে দিন',
       coach: 'কলারকে কী জিজ্ঞেস করবেন',
       safeWord: 'পারিবারিক গোপন শব্দটি জিজ্ঞেস করুন',
       trust: 'আমি নিশ্চিত, কল চালিয়ে যাব',
       sheetTitle: 'চালিয়ে যাওয়ার আগে',
       sheetBody: 'যেই হোক, পিন বা ওটিপি কখনো বলবেন না। সন্দেহ হলে কল কেটে নিজে ফোন করুন।',
-      sheetBack: 'ঠিক আছে, ফিরে যাই', sheetContinue: 'তবুও কল চালিয়ে যান',
-      banner: 'সাবধান! কোড কাউকে বলবেন না',
-      spoken: 'সাবধান। এই কলটি প্রতারণা হতে পারে। কোড কাউকে বলবেন না।'
+      sheetBack: 'ঠিক আছে, ফিরে যাই', sheetContinue: 'তবুও কল চালিয়ে যান'
     },
     en: {
       back: 'Back to call', level: 'VERY HIGH RISK',
-      headline: 'Careful! This call is likely a scam',
-      sub: "The caller says they are your mother, but several signs don't add up.",
       listen: 'Read aloud', why: 'Why we think so', todo: 'What to do now',
-      hangup: 'Hang up now', verify: "Call Mom's saved number to check",
+      hangup: 'Hang up now',
       coach: 'What to ask the caller',
       safeWord: 'Ask for your family safe word',
       trust: "I'm sure, continue the call",
       sheetTitle: 'Before you continue',
       sheetBody: 'Whoever it is, never share a PIN or OTP. If in doubt, hang up and call them yourself.',
-      sheetBack: 'OK, go back', sheetContinue: 'Continue the call anyway',
-      banner: "Careful! Don't share the code",
-      spoken: "Careful. This call may be a scam. Don't share any code."
-    },
-    reasons: [
-      { otp: true,
-        bn: { title: 'কলের মধ্যেই আপনার বিকাশ কোড এসেছে', detail: 'কলার ঠিক এই কোডটাই চাইছে। এটা বললে আপনার টাকা চলে যাবে।', quote: '“কোড এসেছে? নাম্বারগুলো পড়ে শোনাও!”' },
-        en: { title: 'A bKash code arrived during the call', detail: 'This is exactly the code the caller wants. Sharing it lets them take your money.', quote: '“Did the code come? Read me the numbers!”' } },
-      { voice: false,
-        bn: { title: 'আপনার বিকাশ কোড (OTP) চেয়েছে', detail: 'আসল পরিবারের সদস্য বা বিকাশ কখনো আপনার কোড চায় না।', quote: '“তোমার বিকাশে একটা কোড যাবে, ওটা আমাকে বলো।”' },
-        en: { title: 'Asked for your bKash code (OTP)', detail: 'No real family member, and never bKash, needs your code.', quote: '“A code will come to your bKash. Tell it to me.”' } },
-      { voice: false,
-        bn: { title: 'এখনই টাকা চাইছে', detail: 'তাড়া দিয়ে ভাবার সময় না দেওয়া প্রতারকের পুরনো কৌশল।', quote: '“আমি একটা বিপদে পড়েছি, এখনই টাকা লাগবে।”' },
-        en: { title: 'Wants money right now', detail: 'Rushing you so you have no time to think is a classic scam trick.', quote: "“I'm in trouble, I need money right now.”" } },
-      { voice: false,
-        bn: { title: 'কাউকে জানাতে নিষেধ করছে', detail: 'গোপন রাখতে বলে যাতে আপনি কারো কাছে যাচাই না করেন।', quote: '“কাউকে বলো না, তোমার আব্বুকেও না।”' },
-        en: { title: 'Told you to keep it secret', detail: 'Secrecy stops you from checking with anyone else.', quote: "“Don't tell anyone, not even your father.”" } },
-      { voice: true,
-        bn: { title: 'কণ্ঠস্বর নকল হতে পারে', detail: 'অস্বাভাবিক বিরতি আর একঘেয়ে সুর। AI দিয়ে নকল করা কণ্ঠে এমন শোনায়। নাম্বারটিও অচেনা।', quote: '“এটা আমার নতুন নাম্বার।”' },
-        en: { title: 'The voice may be fake', detail: 'Unnatural pauses and a flat tone are common in AI-cloned voices. The number is also unknown.', quote: '“This is my new number.”' } }
-    ]
+      sheetBack: 'OK, go back', sheetContinue: 'Continue the call anyway'
+    }
   },
 
   tactics: [
@@ -146,7 +88,8 @@ window.CS_DATA = {
     { bn: 'ভুয়া কর্তৃপক্ষ', en: 'False authority', what: 'Pretends to be from bKash, Nagad, a bank or the police.', example: '“আমি বিকাশ অফিস থেকে বলছি, আপনার অ্যাকাউন্ট বন্ধ হয়ে যাবে।”', todo: 'Hang up and call the official helpline yourself.' },
     { bn: 'কোড বা পিন চাওয়া', en: 'Asking for your code or PIN', what: 'Asks for the OTP or PIN that lets them empty your account.', example: '“আপনার ফোনে একটা কোড গেছে, একটু বলেন তো।”', todo: 'Never share an OTP or PIN. No genuine caller will ask.' },
     { bn: 'পরিবারের বিপদ (নকল কণ্ঠ)', en: 'Family emergency with a cloned voice', what: 'Uses AI to sound like a family member, often from a new number.', example: '“আমি আম্মু, নতুন নাম্বার থেকে বলছি। টাকা লাগবে।”', todo: 'Call their saved number, or ask your family safe word.' },
-    { bn: 'পুরস্কার বা ফেরতের লোভ', en: 'Prize or refund bait', what: 'Says you won money or are owed a refund, but must pay a fee first.', example: '“আপনি পুরস্কার জিতেছেন, শুধু ফি-টা পাঠান।”', todo: 'If you must pay to receive money, it is a scam.' }
+    { bn: 'পুরস্কার বা ফেরতের লোভ', en: 'Prize or refund bait', what: 'Says you won money or are owed a refund, but must pay a fee first.', example: '“আপনি পুরস্কার জিতেছেন, শুধু ফি-টা পাঠান।”', todo: 'If you must pay to receive money, it is a scam.' },
+    { bn: 'ভুল করে টাকা পাঠানো (ভুয়া এসএমএস)', en: '“Sent by mistake” with a fake SMS', what: 'Sends a fake “money received” SMS from an ordinary number, then asks you to send the money back.', example: '“ভাই, ভুল করে আপনার নাম্বারে টাকা চলে গেছে, ফেরত দেন।”', todo: 'Check your balance in the bKash app. Real mistakes are reversed by bKash, not by you.' }
   ],
 
   seedCalls: [
@@ -160,5 +103,5 @@ window.CS_DATA = {
 
   trustedContacts: ['Ammu', 'Abbu', 'Nusrat Apu'],
   helpOptions: ['Yes', 'Not sure', 'No'],
-  reasonOptions: ['Code request', 'Code alarm', 'Prediction', 'Dodged question', 'Urgency', 'Secrecy', 'Fake voice']
+  reasonOptions: ['Code request', 'Code alarm', 'Prediction', 'Dodged question', 'Urgency', 'Secrecy', 'Threat', 'Fake authority', 'Fake SMS', 'Fee request', 'Fake voice']
 };

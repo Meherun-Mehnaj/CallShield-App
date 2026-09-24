@@ -14,17 +14,31 @@ It's a Progressive Web App built with plain HTML, CSS and JavaScript. There is n
 
 Opening `index.html` directly (double-click) also works, but offline caching is turned off in that mode.
 
+## Demo calls
+
+Home lists five scam callers. Each has its own script, warning signs, predictions, explanation, coach questions and after-call advice.
+
+| Caller | The trick | Mid-call alarm |
+|---|---|---|
+| নকল কণ্ঠে “আম্মু” (cloned voice of Mom) | AI-cloned voice from a new number, family emergency, secrecy, asks for the bKash code | bKash code arrives |
+| ভুয়া বিকাশ এজেন্ট (fake bKash agent) | "Suspicious transactions, your account will be suspended today", asks for the OTP | bKash code arrives |
+| ভুয়া পুলিশ (fake police officer) | "A case is filed against you, you could be arrested", secrecy, asks for the OTP | bKash code arrives |
+| “ভুল করে টাকা পাঠিয়েছি” (sent by mistake) | Fake "money received" SMS from an ordinary number, sad story, asks you to send it back | Fake SMS is flagged |
+| ভুয়া লটারি পুরস্কার (fake prize) | "You won Tk 50,000 today only", asks for a fee and the OTP | bKash code arrives |
+
+The bKash-agent and police scripts are the survey examples from the team's Demo Guide. The others follow the tactic list in the guide.
+
 ## Demo script
 
-1. **Home:** tap *Start demo call*.
+1. **Home:** pick a caller under *Try a demo scam call*.
 2. **Incoming call:** tap *Accept*.
 3. **Live call:** CallShield flags scam tactics as the caller talks. *Replay demo* restarts it.
-   - **Prediction (from the start):** shows which stage of the scam script the call is in (Hook → Crisis → Secrecy → Take) and **what the caller will likely ask next**. After each stage it confirms "Last prediction came true".
-   - **Challenge coach (any time):** tap *What to ask them* for questions only the real Ammu could answer. Tap *Ask* and the scammer dodges ("No time for questions!"). That adds a new warning sign and raises the risk.
+   - **Prediction (from the start):** shows which stage of the scam script the call is in and **what the caller will likely ask next**. After each stage it confirms "Last prediction came true".
+   - **Challenge coach (any time):** tap *What to ask them* for questions a real caller could answer and a scammer can't. Tap *Ask* and the scammer dodges. That adds a new warning sign and raises the risk.
    - **About 12 s:** the warning banner appears.
-   - **About 15 s:** a fake bKash code SMS arrives and the **code-arrival alarm** takes over the screen, with "Stop! This is the code the caller wants".
-4. **Why?:** a plain-Bangla explanation with the caller's own words as evidence. If the code arrived, that is listed as the first reason. Switch between বাংলা, EN and Both, or tap *Read aloud*.
-5. **Hang up** or **Call Mom's saved number**, then take the next steps and answer the two feedback questions.
+   - **About 15 s:** the mid-call alarm takes over the screen: a bKash code arrived, or (for the "sent by mistake" call) the payment SMS is fake.
+4. **Why?:** a plain-Bangla explanation with the caller's own words as evidence. Switch between বাংলা, EN and Both, or tap *Read aloud*.
+5. **Hang up**, or use the check button (call Mom's saved number, call 16247, call 999, or check the bKash app), then take the next steps and answer the two feedback questions.
 6. **Calls:** the demo call now appears in the history.
 
 ## Things you can change during testing (Settings)
@@ -43,14 +57,15 @@ Opening `index.html` directly (double-click) also works, but offline caching is 
 
 All data stays in the browser on that device (`localStorage`). Nothing is sent anywhere.
 
-Each feedback row in the CSV records which features were on (`prediction`, `codeAlarm`, `coach`, `voiceCheck`), whether the code arrived, and whether the participant asked a check question. That lets you compare conditions, for example the warning alone versus the warning plus prediction.
+Each feedback row in the CSV records which demo caller was used (`scenario`), which features were on (`prediction`, `codeAlarm`, `coach`, `voiceCheck`), whether the code arrived, and whether the participant asked a check question. That lets you compare conditions, for example the warning alone versus the warning plus prediction.
 
 ## Files
 
 ```
 index.html            app shell
 css/styles.css        all styling
-js/data.js            content: scenario script, warning text, scam tactics, sample calls
+js/scenarios.js       the five demo scam calls (script, signs, predictions, warning, coach, next steps)
+js/data.js            shared content: icons, warning-screen labels, scam tactics, sample calls
 js/app.js             screens, router, call simulation, storage
 manifest.webmanifest  install info (name, colours, icon)
 sw.js                 offline cache
@@ -58,7 +73,7 @@ icons/                app icons
 start.bat             local server launcher
 ```
 
-To change the scam script, the warning wording or the tactics, edit `js/data.js`. The screens pick up the changes automatically.
+To change a caller's script or warning, or to add a new caller, edit `js/scenarios.js`. Copy one entry and change its text. To change the tactics on the Learn tab, edit `js/data.js`. The screens pick up the changes automatically.
 
 ## Notes
 
