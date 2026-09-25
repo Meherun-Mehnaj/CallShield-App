@@ -16,7 +16,7 @@ Opening `index.html` directly (double-click) also works, but offline caching is 
 
 ## Demo calls
 
-Home lists five scam callers. Each has its own script, warning signs, predictions, explanation, coach questions and after-call advice.
+*Start demo call* on Home plays one of five scam callers at random, never the same one twice in a row. The app doesn't show which one it picked. Each caller has its own script, warning signs, predictions, explanation, coach questions and after-call advice. The study CSV's `scenario` column records which caller each participant heard.
 
 | Caller | The trick | Mid-call alarm |
 |---|---|---|
@@ -30,7 +30,7 @@ The bKash-agent and police scripts are the survey examples from the team's Demo 
 
 ## Demo script
 
-1. **Home:** pick a caller under *Try a demo scam call*.
+1. **Home:** tap *Start demo call*. A random scam caller rings.
 2. **Incoming call:** tap *Accept*.
 3. **Live call:** CallShield flags scam tactics as the caller talks. *Replay demo* restarts it.
    - **Prediction (from the start):** shows which stage of the scam script the call is in and **what the caller will likely ask next**. After each stage it confirms "Last prediction came true".

@@ -55,7 +55,7 @@
   let S = load();
 
   // Transient UI state
-  const ui = { filter: 'All', sheet: false, coach: false, warnLang: null, editingSafe: false, safeDraft: '', freshId: null, sid: SCENARIOS[0].id };
+  const ui = { filter: 'All', sheet: false, coach: false, warnLang: null, editingSafe: false, safeDraft: '', freshId: null, sid: SCENARIOS[0].id, lastPick: null };
   let call = null; // the running call, or the one that just ended
   let lastRoute = null;
   let toastTimer = null;
@@ -190,22 +190,10 @@
           </div>
         </header>
         ${status}
-        <section class="card stack" style="gap:6px;padding:16px 16px 8px">
+        <section class="card stack" style="gap:12px">
           <h2 class="h2">Try a demo scam call</h2>
-          <p class="body" style="font-size:14px">Choose who is calling. See how CallShield spots the trick and warns you.</p>
-          <ul class="demo-list">
-            ${SCENARIOS.map((s) => `
-            <li>
-              <button class="demo-pick" data-action="start-demo" data-v="${s.id}">
-                <span class="demo-icon">${icon(s.icon, 20)}</span>
-                <span class="grow stack" style="gap:1px">
-                  <span class="strong" style="font-size:16px">${s.title.bn}</span>
-                  <span class="small">${s.title.en} · ${s.blurb.en}</span>
-                </span>
-                <span class="demo-go">${icon('phone', 18)}</span>
-              </button>
-            </li>`).join('')}
-          </ul>
+          <p class="body">A scammer will call you. See how CallShield spots the trick and warns you before you lose money.</p>
+          <button class="btn btn-primary" data-action="start-demo">${icon('phone', 20)}Start demo call</button>
         </section>
         <section class="stack">
           <h2 class="eyebrow">This week</h2>
@@ -257,7 +245,6 @@
         <div class="stack" style="gap:2px">
           <h1>${sc().number}</h1>
           <span class="small" style="font-size:14px">On call · <span id="clock">00:00</span></span>
-          <span class="demo-tag">Demo: ${sc().title.en}</span>
         </div>
         <button class="btn btn-ghost-dark" data-action="replay">Replay demo</button>
       </header>
@@ -883,7 +870,12 @@
 
   // ---------- Actions ----------
   const actions = {
-    'start-demo': (el) => { ui.sid = el.dataset.v || SCENARIOS[0].id; go('incoming'); },
+    // Each demo call is a random scam story, never the same one twice in a row.
+    'start-demo': () => {
+      const others = SCENARIOS.filter((s) => s.id !== ui.lastPick);
+      ui.sid = ui.lastPick = others[Math.floor(Math.random() * others.length)].id;
+      go('incoming');
+    },
     'enable-live': () => { S.settings.live = true; save(); render(); },
     decline: () => go('home'),
     accept: startCall,
